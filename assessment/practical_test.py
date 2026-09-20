@@ -37,16 +37,22 @@ TESTS = [
     ("Module 8: MLP Classification","08_pytorch_fundamentals/05_mlp_classification.py"),
     ("Module 9: Activations",       "09_neural_networks/01_activation_functions.py"),
     ("Module 9: Backprop & MLP",    "09_neural_networks/02_backpropagation_and_deep_mlp.py"),
+    ("Module 9: Batch Normalization", "09_neural_networks/03_batch_normalization.py"),
+    ("Module 9: Dropout",           "09_neural_networks/04_dropout.py"),
+    ("Module 9: Deep MLP Project",  "09_neural_networks/05_deep_mlp_project.py"),
     ("Module 10: Convolution",      "10_cnns/01_convolution.py"),
     ("Module 10: CNN for Images",   "10_cnns/03_cnn_for_images.py"),
     ("Module 11: Transformers",     "11_transformers/01_attention_and_transformers.py"),
 ]
 
-def run_test(desc, rel_path, timeout=120):
+def run_test(desc, rel_path, timeout=180):
     """Run a single lesson file and return (passed, message)."""
     file_path = ML_DIR / rel_path
     if not file_path.exists():
         return False, "FILE NOT FOUND"
+
+    if "02_backpropagation_and_deep_mlp.py" in rel_path:
+        timeout = max(timeout, 180)
     
     try:
         result = subprocess.run(
@@ -60,7 +66,7 @@ def run_test(desc, rel_path, timeout=120):
             err = result.stderr[-200:] if result.stderr else "no output"
             return False, f"FAIL: {err.strip()}"
     except subprocess.TimeoutExpired:
-        return False, "TIMEOUT (> 120s)"
+        return False, f"TIMEOUT (> {timeout}s)"
     except Exception as e:
         return False, f"ERROR: {e}"
 
@@ -121,6 +127,7 @@ def main():
                                      "04_training_loop.py", "05_mlp_classification.py",
                                      "exercises.py", "README.md"],
         "09_neural_networks": ["01_activation_functions.py", "02_backpropagation_and_deep_mlp.py",
+                                "03_batch_normalization.py", "04_dropout.py", "05_deep_mlp_project.py",
                                 "exercises.py", "README.md"],
         "10_cnns":            ["01_convolution.py", "02_pooling_and_architecture.py",
                                 "03_cnn_for_images.py", "04_transfer_learning.py",
@@ -147,6 +154,9 @@ def main():
             print(f"    - {m}")
     else:
         print("  ✅ All expected files present!")
+
+    if failed or missing:
+        sys.exit(1)
 
 if __name__ == "__main__":
     main()

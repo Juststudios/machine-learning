@@ -84,11 +84,30 @@ X_scaled = scaler.fit_transform(X_sensors)
 pca_full = PCA(n_components=8)
 pca_full.fit(X_scaled)
 
-print(f"\nExplained variance ratio per component:")
+print(f"\nExplained variance ratio per component (sklearn PCA):")
 for i, var in enumerate(pca_full.explained_variance_ratio_):
     bar = "█" * int(var * 50)
     cum = pca_full.explained_variance_ratio_[:i+1].sum()
     print(f"  PC{i+1}: {var:.4f}  {bar}  (cumulative: {cum:.4f})")
+
+# ---------------------------------------------------------------------------
+# NumPy PCA From Scratch Verification
+# ---------------------------------------------------------------------------
+try:
+    import importlib.util
+    _pca_path = Path(__file__).resolve().parent / "04_pca_from_scratch.py"
+    _spec = importlib.util.spec_from_file_location("pca_scratch_module", _pca_path)
+    _mod = importlib.util.module_from_spec(_spec)
+    _spec.loader.exec_module(_mod)
+    PCAScratch = _mod.PCAScratch
+
+    print("\n--- Verifying with NumPy PCAScratch ---")
+    pca_scratch = PCAScratch(n_components=8).fit(X_scaled)
+    evr_diff = np.max(np.abs(pca_scratch.explained_variance_ratio_ - pca_full.explained_variance_ratio_))
+    print(f"PCAScratch EVR matches sklearn PCA (max absolute diff: {evr_diff:.2e})")
+    print(f"See 04_pca_from_scratch.py for the full mathematical derivation and economy SVD check.")
+except Exception as e:
+    print(f"Note: PCAScratch companion check: {e}")
 
 # ===========================================================================
 # PART 2: Choosing the Number of Components

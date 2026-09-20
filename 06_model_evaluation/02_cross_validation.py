@@ -275,9 +275,14 @@ for name, model in models.items():
     print(f"    Mean: {scores.mean():.4f}  Std: {scores.std():.4f}")
     print(f"    Scores: {scores}")
 
-ax.boxplot(all_scores, labels=labels, patch_artist=True,
-           boxprops=dict(facecolor="lightblue", color="navy"),
-           medianprops=dict(color="red", linewidth=2))
+try:
+    ax.boxplot(all_scores, tick_labels=labels, patch_artist=True,
+               boxprops=dict(facecolor="lightblue", color="navy"),
+               medianprops=dict(color="red", linewidth=2))
+except TypeError:
+    ax.boxplot(all_scores, labels=labels, patch_artist=True,
+               boxprops=dict(facecolor="lightblue", color="navy"),
+               medianprops=dict(color="red", linewidth=2))
 ax.set_ylabel("10-Fold CV Accuracy", fontsize=11)
 ax.set_title("Model Stability Comparison\n(box = IQR, whiskers = full range, red = median)",
              fontsize=12)

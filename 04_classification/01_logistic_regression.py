@@ -275,7 +275,7 @@ Logistic Regression handles this with One-vs-Rest (OVR):
 np.random.seed(7)
 n_ok2, n_warn, n_fault2 = 300, 200, 150
 
-X_mc = np.row_stack([
+X_mc = np.vstack([
     np.column_stack([np.random.normal(66, 3, n_ok2),
                      np.random.normal(1.8, 0.4, n_ok2)]),
     np.column_stack([np.random.normal(78, 3, n_warn),
@@ -295,8 +295,9 @@ sc2 = StandardScaler()
 X_tr_sc = sc2.fit_transform(X_tr)
 X_te_sc = sc2.transform(X_te)
 
-# WHY multi_class='ovr': explicitly one-vs-rest for interpretability
-clf_mc = LogisticRegression(multi_class='ovr', max_iter=1000, random_state=42)
+# WHY OneVsRestClassifier: explicitly one-vs-rest for interpretability
+from sklearn.multiclass import OneVsRestClassifier
+clf_mc = OneVsRestClassifier(LogisticRegression(max_iter=1000, random_state=42))
 clf_mc.fit(X_tr_sc, y_tr)
 
 y_te_pred = clf_mc.predict(X_te_sc)
@@ -304,6 +305,35 @@ print(f"Multi-class accuracy: {accuracy_score(y_te, y_te_pred):.3f}")
 print()
 print("Classification Report (3-class):")
 print(classification_report(y_te, y_te_pred, target_names=['OK', 'WARNING', 'FAULT']))
+
+# =============================================================================
+# PART 6: Manual Gradient Descent Verification
+# =============================================================================
+print("\n" + "=" * 65)
+print("PART 6: Verification with NumPy Logistic Regression GD From Scratch")
+print("=" * 65)
+try:
+    import importlib.util
+    _lr_gd_path = Path(__file__).resolve().parent / "01_logistic_regression_gd.py"
+    _spec = importlib.util.spec_from_file_location("lr_gd_module", _lr_gd_path)
+    _mod = importlib.util.module_from_spec(_spec)
+    _spec.loader.exec_module(_mod)
+    LogisticRegressionGD = _mod.LogisticRegressionGD
+    LogisticRegressionOVR = _mod.LogisticRegressionOVR
+
+    clf_scratch = LogisticRegressionGD(learning_rate=0.1, max_iter=2000, l2_reg=0.01)
+    clf_scratch.fit(X_train_sc, y_train)
+    scratch_acc = accuracy_score(y_test, clf_scratch.predict(X_test_sc))
+    print(f"NumPy GD Binary Accuracy:     {scratch_acc:.3f} (sklearn: {accuracy_score(y_test, y_pred):.3f})")
+    print(f"NumPy GD Converged in:        {clf_scratch.n_iter_} iterations (loss: {clf_scratch.losses_[-1]:.4f})")
+
+    clf_ovr = LogisticRegressionOVR(learning_rate=0.1, max_iter=2000, l2_reg=0.01)
+    clf_ovr.fit(X_tr_sc, y_tr)
+    ovr_acc = accuracy_score(y_te, clf_ovr.predict(X_te_sc))
+    print(f"NumPy GD Multiclass Accuracy: {ovr_acc:.3f} (sklearn: {accuracy_score(y_te, y_te_pred):.3f})")
+    print("See 01_logistic_regression_gd.py for the full mathematical derivation and loss curves.")
+except Exception as e:
+    print(f"Note: LogisticRegressionGD companion check: {e}")
 
 print("""
 KEY TAKEAWAYS — Logistic Regression:

@@ -33,16 +33,17 @@ print("=" * 60)
 # are simple and known. But what if the rules are complex, or there are
 # thousands of interacting factors?
 
-def traditional_house_price(sqft, bedrooms, distance_to_city_km):
+def traditional_house_price(sqft, bedrooms, distance_to_city_km=None, **kwargs):
     """
     A hand-coded pricing rule written by a domain expert.
     Problem: these coefficients are guesses. Are they right?
     Real estate markets are far too complex for hand-coded rules.
     """
+    dist = kwargs.get("distance_km", distance_to_city_km if distance_to_city_km is not None else 0)
     price = 0
     price += sqft * 150          # $150 per square foot (guessed)
     price += bedrooms * 8000     # $8k per bedroom (guessed)
-    price -= distance_to_city_km * 2000  # Penalize distance (guessed)
+    price -= dist * 2000         # Penalize distance (guessed)
     price += 50000               # Base price (guessed)
     return price
 

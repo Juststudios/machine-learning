@@ -67,7 +67,7 @@ x = torch.tensor([[1.0, 2.0, -1.0]])  # 1 sample, 3 features
 y_true = torch.tensor([[1.5]])          # 1 target
 
 # Manual setup
-W = torch.tensor([[0.5, -0.3, 0.8]], requires_grad=True).T  # (3, 1)
+W = torch.tensor([[0.5], [-0.3], [0.8]], requires_grad=True)  # (3, 1)
 b = torch.tensor([0.1], requires_grad=True)
 
 # Forward
@@ -96,7 +96,7 @@ dL_db_manual = (dL_dy * dy_dz).sum()
 print(f"\nManual computation:")
 print(f"  dL/dW = {dL_dW_manual.detach().tolist()}")
 print(f"  dL/db = {dL_db_manual.item():.6f}")
-print(f"  Match: {torch.allclose(W.grad, dL_dW_manual)}")
+print(f"  Match: {torch.allclose(W.grad.T, dL_dW_manual)}")
 
 # ===========================================================================
 # PART 2: Deep MLP Architecture — Layer-by-Layer
