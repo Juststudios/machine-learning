@@ -1,4 +1,12 @@
 # Machine Learning & Deep Learning Curriculum
+
+## Key Terminology
+* **Feature:** An input variable used by a machine-learning model.
+* **Target:** The value the model is trying to predict.
+* **Training:** The process of adjusting a model using data.
+* **Model:** A mathematical/computational system that maps inputs to outputs.
+
+
 ## Level 3 & 4 of the Engineering + AI Learning Path
 
 > *"The goal is not to learn algorithms. The goal is to think like an engineer who can reach for the right tool, understand why it works, and know when it fails."*
